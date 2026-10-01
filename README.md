@@ -78,4 +78,4 @@ gold-macro-analysis/
 
 ## Author
 
-[Your Name] · Biomedical engineer interested in data analysis and visualization.
+Francisco Prata · Biomedical engineer interested in data analysis and visualization.
