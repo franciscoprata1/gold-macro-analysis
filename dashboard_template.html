@@ -1,0 +1,328 @@
+<title>Gold Against the Machine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,650&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: single reading column of three studies, each a claim → chart → numbers, like an analyst's research note */
+:root{
+  --bg:#f7f7f4; --surface:#ffffff; --ink:#16181b; --ink-2:#4a4d52; --ink-3:#7b7e83;
+  --rule:#e3e3dd; --grid:#ececE6; --accent:#8a5a00;
+  --s-gold:#c98500; --s-m2:#2a78d6; --s-cpi:#1baf7a; --s-spx:#4a3aa7; --s-yield:#2a78d6;
+  --c-us:#2a78d6; --c-uk:#eb6834; --c-es:#1baf7a; --c-ea:#eda100;
+  --font-display:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-body:"Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono:"JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141413; --surface:#1c1c1a; --ink:#f2f1ec; --ink-2:#c3c2b7; --ink-3:#8e8d85;
+  --rule:#2f2f2c; --grid:#2a2a27; --accent:#e0a83a;
+  --s-gold:#c98500; --s-m2:#3987e5; --s-cpi:#199e70; --s-spx:#9085e9; --s-yield:#3987e5; --c-us:#3987e5; --c-uk:#d95926; --c-es:#199e70; --c-ea:#c98500; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141413; --surface:#1c1c1a; --ink:#f2f1ec; --ink-2:#c3c2b7; --ink-3:#8e8d85;
+  --rule:#2f2f2c; --grid:#2a2a27; --accent:#e0a83a;
+  --s-gold:#c98500; --s-m2:#3987e5; --s-cpi:#199e70; --s-spx:#9085e9; --s-yield:#3987e5; --c-us:#3987e5; --c-uk:#d95926; --c-es:#199e70; --c-ea:#c98500; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.6}
+.wrap{max-width:960px;margin:0 auto;padding-inline:20px;padding-block:40px 64px}
+header{display:grid;gap:12px;padding-bottom:28px;border-bottom:1px solid var(--rule)}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+h1{font-family:var(--font-display);font-weight:650;font-size:clamp(30px,5vw,44px);line-height:1.1;margin:0;text-wrap:balance}
+.lede{color:var(--ink-2);max-width:64ch;margin:0;font-size:16px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:28px}
+.kpi{background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:14px 16px;display:grid;gap:4px}
+.kpi .k{font-size:12px;color:var(--ink-3);display:flex;align-items:center;gap:8px}
+.kpi .k i{width:10px;height:3px;border-radius:2px;display:inline-block}
+.kpi .v{font-family:var(--font-mono);font-size:24px;font-weight:500;font-variant-numeric:tabular-nums}
+.kpi .s{font-size:12px;color:var(--ink-3)}
+.kpinote{font-size:12px;color:var(--ink-3);margin:10px 0 0}
+section{padding-top:48px;display:grid;gap:16px}
+.qnum{font-family:var(--font-mono);font-size:12px;color:var(--ink-3);letter-spacing:.06em;text-transform:uppercase}
+h2{font-family:var(--font-display);font-weight:650;font-size:clamp(22px,3.4vw,28px);line-height:1.2;margin:0;text-wrap:balance}
+.answer{font-size:16px;color:var(--ink);max-width:68ch;margin:0}
+.answer b{font-weight:600}
+.panel{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:18px 18px 12px;display:grid;gap:8px;min-width:0}
+.panel h3{margin:0;font-size:14px;font-weight:600}
+.panel .sub{margin:0;font-size:12.5px;color:var(--ink-3)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:14px;height:3px;border-radius:2px;display:inline-block}
+.chart{position:relative;height:300px}
+.chart.short{height:200px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border-top:1px solid var(--rule)}
+.fact{padding:14px 16px 4px 0;display:grid;gap:2px;min-width:0}
+.fact .n{font-family:var(--font-mono);font-size:20px;font-variant-numeric:tabular-nums}
+.fact .t{font-size:13px;color:var(--ink-2)}
+.notes{max-width:68ch;color:var(--ink-2);margin:0;padding-left:18px;display:grid;gap:6px}
+.controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+.seg button{font:500 13px var(--font-body);color:var(--ink-2);background:transparent;border:0;padding:8px 14px;cursor:pointer}
+.seg button.on{background:var(--ink);color:var(--bg)}
+.seg button:focus-visible,.amt input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.amt{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2)}
+.amt input{width:110px;font:500 15px var(--font-mono);color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:6px;padding:7px 10px}
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:520px}
+th{font-weight:600;font-size:12px;color:var(--ink-3);text-align:right;padding:8px 10px;border-bottom:1px solid var(--rule)}
+th:first-child,td:first-child{text-align:left}
+td{padding:8px 10px;border-bottom:1px solid var(--rule);text-align:right;font-family:var(--font-mono);font-variant-numeric:tabular-nums;color:var(--ink-2)}
+td .big{color:var(--ink);font-weight:500}
+td .full{color:var(--accent);font-weight:600}
+td small{display:block;font-size:11px;color:var(--ink-3)}
+td.win{background:color-mix(in srgb,var(--accent) 10%,transparent)}
+tr:last-child td{border-bottom:0}
+footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--rule);font-size:13px;color:var(--ink-3);display:grid;gap:8px}
+footer a{color:var(--ink-2)}
+@media (max-width:720px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.two{grid-template-columns:1fr}.facts{grid-template-columns:1fr}.chart{height:260px}}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">US data · monthly · Jan 1971 – Aug 2026</div>
+  <h1>Gold, stocks, bonds and the money supply</h1>
+  <p class="lede">Four questions, tested on 55 years of US data starting in 1971, the year the dollar's link to gold ended and gold began to trade freely.</p>
+  <div class="kpis">
+    <div class="kpi"><div class="k"><i style="background:var(--s-gold)"></i>Gold</div><div class="v">9.2%</div><div class="s">per year · ×125</div></div>
+    <div class="kpi"><div class="k"><i style="background:var(--s-spx)"></i>S&amp;P 500 (price only)</div><div class="v">8.1%</div><div class="s">per year · ×74</div></div>
+    <div class="kpi"><div class="k"><i style="background:var(--s-m2)"></i>M2 money supply</div><div class="v">6.7%</div><div class="s">per year · ×35</div></div>
+    <div class="kpi"><div class="k"><i style="background:var(--s-cpi)"></i>Consumer prices (CPI)</div><div class="v">3.9%</div><div class="s">per year · ×8.2</div></div>
+  </div>
+  <p class="kpinote">Compound annual growth, January 1971 to January 2026. S&amp;P 500 excludes dividends, which historically added roughly 2–3 points a year and would put stocks ahead of gold.</p>
+</header>
+
+<section id="money">
+  <div class="qnum">Question 1</div>
+  <h2>Does money printing drive the gold price?</h2>
+  <p class="answer"><b>Over decades, partly yes. Year to year, no.</b> Gold has outgrown both the money supply and consumer prices since 1971, so it has preserved purchasing power. But the timing does not follow M2: from 1980 to 2001 the money supply more than tripled while gold lost 61% of its value.</p>
+  <div class="panel">
+    <h3>Growth since 1971, indexed to 100</h3>
+    <p class="sub">January values, log scale so equal slopes mean equal growth rates</p>
+    <div class="legend"><span><i style="background:var(--s-gold)"></i>Gold</span><span><i style="background:var(--s-m2)"></i>M2 money supply</span><span><i style="background:var(--s-cpi)"></i>Consumer prices</span></div>
+    <div class="chart"><canvas id="c-idx" aria-label="Gold, M2 and CPI indexed to 1971"></canvas></div>
+  </div>
+  <div class="panel">
+    <h3>Gold price relative to the money supply</h3>
+    <p class="sub">Gold ÷ M2, indexed so 1971 = 1.0. Above 1 means gold rose faster than money was created.</p>
+    <div class="chart short"><canvas id="c-gm2" aria-label="Gold divided by M2"></canvas></div>
+  </div>
+  <div class="facts">
+    <div class="fact"><div class="n">−0.01</div><div class="t">Correlation of yearly gold and M2 growth</div></div>
+    <div class="fact"><div class="n">0.53</div><div class="t">Same correlation over 10-year windows</div></div>
+    <div class="fact"><div class="n">7.6× → 0.9×</div><div class="t">Gold/M2 ratio, 1980 peak to 2001 low</div></div>
+  </div>
+  <ul class="notes">
+    <li>Money growth sets a long-run floor for gold, but sentiment, interest rates and crises decide when gold moves.</li>
+    <li>After the 2020–21 surge in M2 (+26% in one year), gold rose briefly, then went sideways until 2024 before its biggest rally since the 1970s.</li>
+    <li>CPI tracks gold slightly better than M2 does (0.30 yearly correlation), which fits gold's role as an inflation hedge rather than a money-supply mirror.</li>
+  </ul>
+</section>
+
+<section id="bonds">
+  <div class="qnum">Question 2</div>
+  <h2>How does gold relate to bond yields?</h2>
+  <p class="answer"><b>Through real yields, not nominal ones.</b> The real yield is the 10-year Treasury rate minus inflation, the return a bond pays after inflation. When it falls, holding gold (which pays nothing) costs less, and gold tends to rise. Nominal yields alone show no relationship.</p>
+  <div class="two">
+    <div class="panel">
+      <h3>Gold price</h3>
+      <p class="sub">USD per troy ounce, log scale</p>
+      <div class="chart"><canvas id="c-gold" aria-label="Monthly gold price"></canvas></div>
+    </div>
+    <div class="panel">
+      <h3>US 10-year real yield</h3>
+      <p class="sub">10-year yield minus 12-month CPI inflation, %</p>
+      <div class="chart"><canvas id="c-real" aria-label="US 10-year real yield"></canvas></div>
+    </div>
+  </div>
+  <div class="facts">
+    <div class="fact"><div class="n">−0.43</div><div class="t">12-month change in gold vs change in real yield</div></div>
+    <div class="fact"><div class="n">0.06</div><div class="t">Same, using the nominal 10-year yield</div></div>
+    <div class="fact"><div class="n">2022 →</div><div class="t">Real yields rose, yet gold kept climbing</div></div>
+  </div>
+  <ul class="notes">
+    <li>Deeply negative real yields in the late 1970s and 2020–22 coincided with strong gold years.</li>
+    <li>Since 2022 the link has weakened: real yields turned positive while gold more than doubled. Large gold purchases by central banks are the most common explanation.</li>
+  </ul>
+</section>
+
+<section id="stocks">
+  <div class="qnum">Question 3</div>
+  <h2>Do gold and the S&amp;P 500 move together?</h2>
+  <p class="answer"><b>Almost independently, which is why they diversify each other.</b> Their monthly returns have essentially zero correlation over 55 years. Instead they take turns: stocks dominated the 1980s and 1990s, gold the 1970s and 2000s.</p>
+  <div class="panel">
+    <h3>S&amp;P 500 priced in ounces of gold</h3>
+    <p class="sub">Ounces of gold needed to buy one unit of the index. Rising means stocks are outperforming gold.</p>
+    <div class="chart"><canvas id="c-ratio" aria-label="S&P 500 divided by gold price"></canvas></div>
+  </div>
+  <div class="panel">
+    <h3>Rolling 3-year correlation of monthly returns</h3>
+    <p class="sub">+1 moves together, 0 unrelated, −1 opposite</p>
+    <div class="chart short"><canvas id="c-roll" aria-label="Rolling correlation between gold and S&P 500"></canvas></div>
+  </div>
+  <div class="facts">
+    <div class="fact"><div class="n">0.00</div><div class="t">Monthly return correlation, 1971–2026</div></div>
+    <div class="fact"><div class="n">5.4 oz</div><div class="t">Peak, August 2000 (dot-com top)</div></div>
+    <div class="fact"><div class="n">0.16 oz</div><div class="t">Low, January 1980 (gold peak); 1.75 oz today</div></div>
+  </div>
+</section>
+
+<section id="houses">
+  <div class="qnum">Question 4</div>
+  <h2>What does a house cost in gold, and in stocks?</h2>
+  <p class="answer"><b>In money, houses got 11 to 50 times more expensive. In gold, they are cheaper today than in 1975 everywhere we measured.</b> But gold only protected you over long periods: the price of a house in ounces swung more than sixfold, so when you bought the gold mattered a lot. Stocks did better over the full 50 years, but gold has won for most starting years since the late 1990s.</p>
+
+  <div class="panel calc">
+    <h3>If I had this much, how much of a house could I buy?</h3>
+    <div class="controls">
+      <div class="seg" role="radiogroup" aria-label="Asset">
+        <button type="button" id="m-gold" class="on" aria-pressed="true">Ounces of gold</button>
+        <button type="button" id="m-spx" aria-pressed="false">S&amp;P 500 units</button>
+      </div>
+      <label class="amt" for="amount">Amount <input id="amount" type="number" min="1" step="1" value="100" inputmode="numeric"></label>
+    </div>
+    <p class="sub" id="calc-sub"></p>
+    <div class="tbl"><table id="calc">
+      <thead><tr><th>Year</th><th>United States</th><th>United Kingdom</th><th>Spain</th></tr></thead><tbody></tbody>
+    </table></div>
+  </div>
+
+  <div class="panel">
+    <h3>Price of a typical house in ounces of gold</h3>
+    <p class="sub">January of each year, log scale. Lower means a house is cheaper in gold.</p>
+    <div class="legend"><span><i style="background:var(--c-us)"></i>United States</span><span><i style="background:var(--c-uk)"></i>United Kingdom</span><span><i style="background:var(--c-es)"></i>Spain</span></div>
+    <div class="chart"><canvas id="c-hoz" aria-label="House prices in ounces of gold"></canvas></div>
+  </div>
+
+  <div class="panel">
+    <h3>Gold cost of a house, including the euro area</h3>
+    <p class="sub">Indexed so 1975 = 100. Below 100 means a house costs fewer ounces than in 1975.</p>
+    <div class="legend"><span><i style="background:var(--c-us)"></i>United States</span><span><i style="background:var(--c-uk)"></i>United Kingdom</span><span><i style="background:var(--c-es)"></i>Spain</span><span><i style="background:var(--c-ea)"></i>Euro area</span></div>
+    <div class="chart"><canvas id="c-hidx" aria-label="Gold cost of a house indexed to 1975"></canvas></div>
+  </div>
+
+  <div class="panel">
+    <h3>Price of a typical house in S&amp;P 500 units</h3>
+    <p class="sub">House price in dollars ÷ the index level, log scale. Price index only, so dividends would make stocks look even better.</p>
+    <div class="legend"><span><i style="background:var(--c-us)"></i>United States</span><span><i style="background:var(--c-uk)"></i>United Kingdom</span><span><i style="background:var(--c-es)"></i>Spain</span></div>
+    <div class="chart"><canvas id="c-hsp" aria-label="House prices in S&P 500 units"></canvas></div>
+  </div>
+
+  <div class="panel">
+    <h3>Saved one house's worth in year X. How many houses does it buy in 2026?</h3>
+    <p class="sub">Buy gold or the S&amp;P 500 equal to one house, hold it, then buy houses in January 2026.</p>
+    <div class="tbl"><table id="hold">
+      <thead><tr><th rowspan="2">Saved in</th><th colspan="3">Held in gold</th><th colspan="3">Held in S&amp;P 500</th></tr>
+      <tr><th>US</th><th>UK</th><th>Spain</th><th>US</th><th>UK</th><th>Spain</th></tr></thead><tbody></tbody>
+    </table></div>
+  </div>
+
+  <div class="facts">
+    <div class="fact"><div class="n">217 → 86 oz</div><div class="t">US median new house, 1975 to 2026</div></div>
+    <div class="fact"><div class="n">582 oz</div><div class="t">US peak in 2000, when gold was cheapest</div></div>
+    <div class="fact"><div class="n">×50</div><div class="t">Spanish house prices in money since 1975</div></div>
+  </div>
+  <ul class="notes">
+    <li><b>Timing dominates.</b> Gold bought in 2000 or 2005 now buys four to eight times more house. Gold bought at the 1980 peak buys about the same house in the US, and less in the UK and Spain.</li>
+    <li><b>Today is unusual.</b> After gold's rally since 2024, a US house is the cheapest in gold of the whole period, and UK and Spanish houses the cheapest since the early 1980s. Put the other way, gold is historically expensive relative to housing.</li>
+    <li><b>Stocks or gold depends on the start year.</b> Savings started from 1975 to 1995, or from 2009 to 2013, bought more house in the S&amp;P 500. Savings started from 1996 to 2008, or from 2014 onwards, bought more in gold. This uses the price index only; with dividends, stocks would win more often.</li>
+  </ul>
+</section>
+
+<footer>
+  <div><b>Method.</b> Monthly data, January 1971 to August 2026, analysed in Python with pandas. Correlations use log returns. Correlation shows co-movement, not cause.</div>
+  <div><b>Sources.</b> Gold: <a href="https://github.com/datasets/gold-prices">datasets/gold-prices</a> (monthly average). S&amp;P 500: <a href="https://github.com/datasets/s-and-p-500">datasets/s-and-p-500</a> (Shiller). 10-year yield: <a href="https://github.com/datasets/bond-yields-us-10y">datasets/bond-yields-us-10y</a>. CPI: <a href="https://github.com/datasets/cpi-us">datasets/cpi-us</a> (BLS CPI-U). M2: <a href="https://fred.stlouisfed.org/series/M2SL">FRED M2SL</a>, January value of each year.</div>
+  <div><b>House prices.</b> US: <a href="https://fred.stlouisfed.org/series/MSPUS">Census median price of new houses sold</a>. UK: HM Land Registry average of £268,000 in <a href="https://www.gov.uk/government/statistics/uk-house-price-index-for-january-2026/uk-house-price-index-summary-january-2026">January 2026</a>, taken back in time with the <a href="https://fred.stlouisfed.org/series/QGBN628BIS">BIS UK property price index</a>. Spain: a 90 m² home at the notaries' January 2026 average of <a href="https://www.helpmycash.com/blog/el-precio-de-la-vivienda-alcanzo-un-nuevo-record-en-enero-y-hundio-las-compraventas-segun-los-notarios/">€2,065/m²</a> (about €186,000), taken back with the <a href="https://fred.stlouisfed.org/series/QESN628BIS">BIS Spain index</a>. Euro area: <a href="https://fred.stlouisfed.org/series/QXMN628BIS">BIS index</a> only, since there is no official average price; before 1999 the Deutsche Mark stands in for the euro. Exchange rates: FRED January spot rates. Early UK and Spain levels are estimates and may be off by 20% or so; the trends are reliable.</div>
+</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const D = __DATA__;
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const charts = [];
+const crosshair = {id:'crosshair', afterDatasetsDraw(c){const a=c.tooltip&&c.tooltip.getActiveElements();if(!a||!a.length)return;const x=a[0].element.x,{top,bottom}=c.chartArea,ctx=c.ctx;ctx.save();ctx.strokeStyle=css('--ink-3');ctx.lineWidth=1;ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,bottom);ctx.stroke();ctx.restore();}};
+const endLabels = {id:'endLabels', afterDatasetsDraw(c,_,o){if(!o.on)return;const ctx=c.ctx;ctx.save();ctx.font='500 11px '+css('--font-mono');ctx.textBaseline='middle';
+  const items=c.data.datasets.map((ds,i)=>{const m=c.getDatasetMeta(i);const p=m.data[m.data.length-1];return {y:p.y,x:p.x,t:ds.endLabel,col:ds.borderColor};}).sort((a,b)=>a.y-b.y);
+  for(let i=1;i<items.length;i++){if(items[i].y-items[i-1].y<14)items[i].y=items[i-1].y+14;}
+  items.forEach(it=>{ctx.fillStyle=it.col;ctx.fillRect(it.x+6,it.y-1.5,8,3);ctx.fillStyle=css('--ink-2');ctx.fillText(it.t,it.x+18,it.y);});ctx.restore();}};
+Chart.register(crosshair,endLabels);
+
+function base(opts){
+  const ink3=css('--ink-3'), grid=css('--grid');
+  return {responsive:true,maintainAspectRatio:false,animation:false,
+    interaction:{mode:'index',intersect:false},
+    layout:{padding:{right:opts.padRight||8}},
+    plugins:{legend:{display:false},endLabels:{on:!!opts.endLabels},
+      tooltip:{backgroundColor:css('--surface'),titleColor:css('--ink'),bodyColor:css('--ink-2'),borderColor:css('--rule'),borderWidth:1,padding:10,
+        titleFont:{family:css('--font-body'),weight:'600'},bodyFont:{family:css('--font-mono'),size:12},boxWidth:10,boxHeight:3,usePointStyle:false,
+        callbacks:{label:opts.label}}},
+    elements:{point:{radius:0,hoverRadius:4,hitRadius:8},line:{borderWidth:2,tension:0}},
+    scales:{x:{grid:{display:false},border:{color:grid},ticks:{color:ink3,font:{family:css('--font-mono'),size:11},maxRotation:0,autoSkip:true,maxTicksLimit:opts.xTicks||8,callback:opts.xFmt}},
+      y:Object.assign({grid:{color:grid},border:{display:false},ticks:{color:ink3,font:{family:css('--font-mono'),size:11},maxTicksLimit:6}},opts.y||{})}};
+}
+const yearFromMonth = function(v){const s=this.getLabelForValue(v);return s.slice(0,4);};
+const fmt = (n,d=0)=>n==null?'–':n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+function ds(label,data,color,extra){return Object.assign({label,data,borderColor:color,backgroundColor:color,spanGaps:true},extra||{});}
+function zeroLine(at){return {id:'zl',beforeDatasetsDraw(c){const y=c.scales.y.getPixelForValue(at);if(y<c.chartArea.top||y>c.chartArea.bottom)return;const ctx=c.ctx;ctx.save();ctx.strokeStyle=css('--ink-3');ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(c.chartArea.left,y);ctx.lineTo(c.chartArea.right,y);ctx.stroke();ctx.restore();}};}
+
+function build(){
+  charts.splice(0).forEach(c=>c.destroy());
+  const A=D.annual, M=D.monthly;
+  charts.push(new Chart(document.getElementById('c-idx'),{type:'line',data:{labels:A.years,datasets:[
+    ds('Gold',A.gold,css('--s-gold'),{endLabel:'×'+fmt(A.gold.at(-1)/100)}),
+    ds('M2',A.m2,css('--s-m2'),{endLabel:'×'+fmt(A.m2.at(-1)/100)}),
+    ds('CPI',A.cpi,css('--s-cpi'),{endLabel:'×'+fmt(A.cpi.at(-1)/100,1)})]},
+    options:base({endLabels:true,padRight:58,xTicks:7,y:{type:'logarithmic',min:50,max:20000,ticks:{color:css('--ink-3'),font:{family:css('--font-mono'),size:11},callback:v=>[100,300,1000,3000,10000].includes(v)?fmt(v):''}},
+      label:c=>` ${c.dataset.label}: ${fmt(c.parsed.y)}  (×${fmt(c.parsed.y/100,1)})`})}));
+  charts.push(new Chart(document.getElementById('c-gm2'),{type:'line',data:{labels:A.years,datasets:[ds('Gold ÷ M2',A.gold_m2.map(v=>v/100),css('--s-gold'))]},
+    options:base({xTicks:7,y:{min:0,max:8,ticks:{color:css('--ink-3'),font:{family:css('--font-mono'),size:11},stepSize:2,callback:v=>v+'×'}},label:c=>` Gold ÷ M2: ${fmt(c.parsed.y,2)}×`}),plugins:[zeroLine(1)]}));
+  charts.push(new Chart(document.getElementById('c-gold'),{type:'line',data:{labels:M.dates,datasets:[ds('Gold',M.gold,css('--s-gold'))]},
+    options:base({xFmt:yearFromMonth,xTicks:6,y:{type:'logarithmic',min:30,max:6000,ticks:{color:css('--ink-3'),font:{family:css('--font-mono'),size:11},callback:v=>[50,100,300,1000,3000].includes(v)?'$'+fmt(v):''}},label:c=>` Gold: $${fmt(c.parsed.y)}/oz`})}));
+  charts.push(new Chart(document.getElementById('c-real'),{type:'line',data:{labels:M.dates,datasets:[ds('Real yield',M.real,css('--s-yield'))]},
+    options:base({xFmt:yearFromMonth,xTicks:6,y:{min:-8,max:10,ticks:{color:css('--ink-3'),font:{family:css('--font-mono'),size:11},stepSize:4,callback:v=>v+'%'}},label:c=>` Real 10-yr yield: ${fmt(c.parsed.y,1)}%`}),plugins:[zeroLine(0)]}));
+  charts.push(new Chart(document.getElementById('c-ratio'),{type:'line',data:{labels:M.dates,datasets:[ds('S&P 500 in gold',M.spx_in_gold,css('--s-spx'))]},
+    options:base({xFmt:yearFromMonth,xTicks:8,y:{min:0,max:6,ticks:{color:css('--ink-3'),font:{family:css('--font-mono'),size:11},stepSize:1,callback:v=>v+' oz'}},label:c=>` S&P 500 = ${fmt(c.parsed.y,2)} oz of gold`})}));
+  charts.push(new Chart(document.getElementById('c-roll'),{type:'line',data:{labels:M.dates,datasets:[ds('3-yr correlation',M.roll,css('--s-spx'))]},
+    options:base({xFmt:yearFromMonth,xTicks:8,y:{min:-1,max:1,ticks:{color:css('--ink-3'),font:{family:css('--font-mono'),size:11},stepSize:0.5,callback:v=>(v>0?'+':'')+v}},label:c=>` Correlation: ${fmt(c.parsed.y,2)}`}),plugins:[zeroLine(0)]}));
+  buildHouses();
+}
+
+const H = __HOUSES__;
+const HY=[1975,1980,1985,1990,1995,2000,2005,2010,2015,2020,2026];
+const hi = y => H.years.indexOf(y);
+let mode='gold';
+function renderCalc(){
+  const amt=Math.max(0,+document.getElementById('amount').value||0);
+  const k=mode==='gold'?'_oz':'_sp', unit=mode==='gold'?'oz':'units';
+  document.getElementById('calc-sub').textContent = mode==='gold'
+    ? `With ${fmt(amt)} oz of gold, the share of a typical house you could buy each January. Below each figure, the house price in ounces.`
+    : `With ${fmt(amt)} units of the S&P 500 (the index level in dollars, e.g. a fund at $${fmt(H.spx[hi(2026)])} each in 2026), the share of a typical house you could buy.`;
+  document.querySelector('#calc tbody').innerHTML = HY.map(y=>{const i=hi(y);return `<tr><td>${y}</td>`+['us','uk','es'].map(c=>{const p=H[c+k][i],n=amt/p;
+    const txt=n>=1?`<span class="full">${fmt(n,n<10?1:0)} houses</span>`:`<span class="big">${fmt(n*100)}% of a house</span>`;
+    return `<td>${txt}<small>house = ${fmt(p)} ${unit}</small></td>`;}).join('')+'</tr>';}).join('');
+}
+function renderHold(){
+  const L=hi(2026);
+  document.querySelector('#hold tbody').innerHTML = HY.slice(0,-1).map(y=>{const i=hi(y);
+    const g=['us','uk','es'].map(c=>H[c+'_oz'][i]/H[c+'_oz'][L]), s=['us','uk','es'].map(c=>H[c+'_sp'][i]/H[c+'_sp'][L]);
+    const cell=(v,win)=>`<td class="${win?'win':''}"><span class="big">${fmt(v,v<10?1:0)}</span></td>`;
+    return `<tr><td>${y}</td>`+g.map((v,j)=>cell(v,v>s[j])).join('')+s.map((v,j)=>cell(v,v>g[j])).join('')+'</tr>';}).join('');
+}
+function setMode(m){mode=m;['gold','spx'].forEach(x=>{const b=document.getElementById('m-'+x);b.classList.toggle('on',x===m);b.setAttribute('aria-pressed',x===m);});renderCalc();}
+document.getElementById('m-gold').addEventListener('click',()=>setMode('gold'));
+document.getElementById('m-spx').addEventListener('click',()=>setMode('spx'));
+document.getElementById('amount').addEventListener('input',renderCalc);
+renderCalc(); renderHold();
+function buildHouses(){
+  const Y=H.years, tk={color:css('--ink-3'),font:{family:css('--font-mono'),size:11}};
+  const three=(k,lab)=>[ds('United States',H['us'+k],css('--c-us'),{endLabel:lab(H['us'+k].at(-1))}),ds('United Kingdom',H['uk'+k],css('--c-uk'),{endLabel:lab(H['uk'+k].at(-1))}),ds('Spain',H['es'+k],css('--c-es'),{endLabel:lab(H['es'+k].at(-1))})];
+  charts.push(new Chart(document.getElementById('c-hoz'),{type:'line',data:{labels:Y,datasets:three('_oz',v=>fmt(v)+' oz')},
+    options:base({endLabels:true,padRight:60,xTicks:7,y:{type:'logarithmic',min:20,max:1000,ticks:Object.assign({},tk,{callback:v=>[20,50,100,200,500,1000].includes(v)?v+' oz':''})},label:c=>` ${c.dataset.label}: ${fmt(c.parsed.y)} oz`})}));
+  const idx=[...three('_oz_i',v=>fmt(v)),ds('Euro area',H.ea_oz_i,css('--c-ea'),{endLabel:fmt(H.ea_oz_i.at(-1))})];
+  charts.push(new Chart(document.getElementById('c-hidx'),{type:'line',data:{labels:Y,datasets:idx},
+    options:base({endLabels:true,padRight:44,xTicks:7,y:{min:0,max:600,ticks:Object.assign({},tk,{stepSize:100})},label:c=>` ${c.dataset.label}: ${fmt(c.parsed.y)}`}),plugins:[zeroLine(100)]}));
+  charts.push(new Chart(document.getElementById('c-hsp'),{type:'line',data:{labels:Y,datasets:three('_sp',v=>fmt(v))},
+    options:base({endLabels:true,padRight:44,xTicks:7,y:{type:'logarithmic',min:10,max:1000,ticks:Object.assign({},tk,{callback:v=>[10,20,50,100,200,500,1000].includes(v)?fmt(v):''})},label:c=>` ${c.dataset.label}: ${fmt(c.parsed.y)} units`})}));
+}
+function start(){ if(window.Chart) build(); }
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(start); else start();
+try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',build);}catch(e){}
+new MutationObserver(build).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+</script>
